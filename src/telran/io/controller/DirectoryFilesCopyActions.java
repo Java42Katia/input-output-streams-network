@@ -16,6 +16,7 @@ public class DirectoryFilesCopyActions {
 	
 	public static ArrayList<Item> getItems(DirectoryFilesCopy dfc) {
 		DirectoryFilesCopyActions.directoryFilesCopy = dfc;
+		// V.R. The following check isn't necessary. The method getItems() is called once only.
 		if (items == null) {
 			items = new ArrayList<Item>(List.of(
 					Item.of("Display directory content", DirectoryFilesCopyActions::displayDirectoryContent), 
@@ -26,6 +27,13 @@ public class DirectoryFilesCopyActions {
 	}
 	
 	private static void displayDirectoryContent(InputOutput io) {
+		/* V.R. It is possible (and necessary) to implement this logic using
+		 * Input/Output features only. For example: 
+			int maxDepth = io.readInt("Enter depth (any integer, if maxDepth < 0 , no depth limitation");
+			String directoryPath = io.readStringPredicate("Enter directory path", "Not directory path",
+				str -> new File(str).isDirectory());
+		 *  It is more simple and clear
+		 */
 		String pathDir = io.readString("Enter path to directory");
 		File dir = new File(pathDir);
 		if (!dir.exists()) io.writeObjectLine("Directory not found");
@@ -37,6 +45,18 @@ public class DirectoryFilesCopyActions {
 	}
 	
 	private static void copyFile(InputOutput io) {
+		/* V.R. It is possible (and necessary) to implement this logic using
+		 * Input/Output features only. For example: 
+			String pathFileSrc = io.readStringPredicate("Enter source path", "Not file path",
+					str -> new File(str).isFile());
+			String pathFileDest = io.readStringPredicate("Enter destination path", " ",
+				str -> {
+					File dest = new File(str);
+					return dest.isFile() || !dest.exists();
+				});
+			boolean flOverwrite = io.readString("overwrite file? "+ "Y/N").matches("[Yy][a-zA-Z]*")? true: false;
+		 *  It is more simple and clear
+		 */
 		String pathSrcFile = io.readString("Enter path to source file");
 		File srcFile = new File(pathSrcFile);
 		if (!srcFile.exists()) {
