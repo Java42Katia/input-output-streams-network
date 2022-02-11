@@ -19,7 +19,8 @@ public class DirectoryFilesCopyImpl implements DirectoryFilesCopy {
 
 	@Override
 	public long copyFiles(String pathFileSrc, String pathFileDest, boolean flOverwrite) {
-		if (!flOverwrite) return 0;
+		//[YG] flOverwrite should be considered only if destination file doesn't exist
+		if (!flOverwrite) return 0; //[YG] returning 0 will confuse the user (not clear why byte rate is 0)
 		InputStream is;
 		OutputStream os;
 		try {
@@ -31,6 +32,7 @@ public class DirectoryFilesCopyImpl implements DirectoryFilesCopy {
 			long startTime = System.currentTimeMillis();
 			while (bytes >= 0) {
 				bytes = is.read(buffer, 0, 1024);
+				//[YG] it's bug, because a read may take less than 1024 bytes, but you write 1024. It means that the garbage may be written in destination
 				os.write(buffer);
 				totalBytes += bytes; 
 			}
@@ -51,8 +53,10 @@ public class DirectoryFilesCopyImpl implements DirectoryFilesCopy {
 		if (file.listFiles() != null) {
 			for (File f : file.listFiles()) {
 				if (f.isDirectory()) {
+					//[YG] number of the File System nodes may be a pretty big, so better to use StringBuilder for concatination rather than += of strings
 					str += tab.repeat(level) + String.format("|__ %s:  dir\n", f.getName());
 					if (level < maxDepth - 1) {
+						//[YG] Using level + 1 instead of ++level much better, as you won't need to do ++ and then --
 						str += getDirectoryContent(f, maxDepth, ++level);
 						--level;
 					}
